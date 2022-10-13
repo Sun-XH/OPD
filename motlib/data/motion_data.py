@@ -89,7 +89,7 @@ def load_motion_json(json_file, image_root, dataset_name=None, extra_annotation_
         # Ideally, this would be handled with something like "extra_img_keys"
         record["camera"] = img_dict["camera"]
         record["depth_file_name"] = img_dict["depth_file_name"]
-        record["label"] = img_dict["label"]
+        # record["label"] = img_dict["label"]
 
         objs = []
         for anno in anno_dict_list:

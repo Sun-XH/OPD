@@ -8,6 +8,7 @@ import json
 from detectron2.data import MetadataCatalog, DatasetCatalog
 from detectron2.config import get_cfg
 from detectron2.utils.logger import setup_logger
+import pdb
 
 from motlib import register_motion_instances, MotionVisualizer, add_motionnet_config
 
@@ -97,8 +98,8 @@ if __name__ == '__main__':
     count = 0
     for d in dataset_dicts:
         if args.is_real:
-            # intrinsic_matrix = np.reshape(d["camera"]["intrinsic"]["matrix"], (3, 3), order='F')
-            intrinsic_matrix = np.array([[283.18526475694443, 0., 126.65098741319443], [0., 283.18526475694443, 128.45118272569442],[ 0., 0., 1.]])    
+            intrinsic_matrix = np.reshape(d["camera"]["intrinsic"], (3, 3), order='F')
+            # intrinsic_matrix = np.array([[283.18526475694443, 0., 126.65098741319443], [0., 283.18526475694443, 128.45118272569442],[ 0., 0., 1.]])    
             line_length = 0.2
         else:
             intrinsic_matrix = None
@@ -111,8 +112,8 @@ if __name__ == '__main__':
             background = np.zeros_like(img).astype(np.uint8)
             cv_in = background.copy()
         else:
-            alpha = img[:, :, 3]
-            img[alpha!=255, :] = [255, 255, 255, 0]
+            # alpha = img[:, :, 3]
+            # img[alpha!=255, :] = [255, 255, 255, 0]
             img = img[:, :, :3]
             cv_in = img.copy()
             cv_in = cv2.cvtColor(cv_in, cv2.COLOR_BGR2RGB)
@@ -123,6 +124,7 @@ if __name__ == '__main__':
             )
             instance_name = f'{(d["file_name"].split("/")[-1]).split(".")[0]}__{i}.png'
             part_ids[instance_name]={}
+            # pdb.set_trace()
             vis = visualizer.draw_gt_instance(d['annotations'][i], part_ids[instance_name], is_real=args.is_real, intrinsic_matrix=intrinsic_matrix, line_length=line_length)
             cv_out = vis.get_image()
             if args.transparent:

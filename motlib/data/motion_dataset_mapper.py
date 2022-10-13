@@ -290,14 +290,14 @@ class MotionDatasetMapper(DatasetMapper):
         #### MotionNet
         # Only use gt in world coordinate for BMOC. For other cases, no need for extra transformation
         if "extrinsic" in dataset_dict["camera"] and "BMOC" in self.network_type:
-            extrinsic_matrix = np.array(dataset_dict["camera"]["extrinsic"]["matrix"])
+            extrinsic_matrix = np.array(dataset_dict["camera"]["extrinsic"])
         else:
             extrinsic_matrix = None
 
         # All other annotations are in camera coordinate, assume the camera intrinsic parameters are fixed (Just used in final visualization)
         dataset_dict.pop("camera")
         dataset_dict.pop("depth_file_name")
-        dataset_dict.pop("label")
+        # dataset_dict.pop("label")
         ####
 
         if not self.is_train and self.use_GTBBX == False and self.use_GT == False:
@@ -440,7 +440,7 @@ def bm_annotations_to_instances(
     else:
         transformation = None
 
-    origins_cam = [obj["motion"]["current_origin"] for obj in annos]
+    origins_cam = [obj["motion"]["origin"] for obj in annos]
     if transformation is not None:
         origins_world = [
             np.dot(transformation, np.array(origin[:] + [1])) for origin in origins_cam
@@ -451,7 +451,7 @@ def bm_annotations_to_instances(
         origins = torch.tensor(origins_cam, dtype=torch.float32)
     target.gt_origins = origins
 
-    axes_cam = [obj["motion"]["current_axis"] for obj in annos]
+    axes_cam = [obj["motion"]["axis"] for obj in annos]
     if transformation is not None:
         axes_end_cam = list(np.asarray(axes_cam) + np.asarray(origins_cam))
         axes_end_world = [

@@ -49,6 +49,7 @@ def getFocalLength(FOV, height, width=None):
 
 def camera_to_image(point, is_real=False, intrinsic_matrix=None):
     point_camera = np.array(point)
+    point_camera[1:3] = -point_camera[1:3]
     # Calculate the camera intrinsic parameters (they are fixed in this project)
     if not is_real:
         # Below is for the MoionNet synthetic dataset intrinsic
@@ -130,12 +131,12 @@ class MotionVisualizer(Visualizer):
                 for c in labels
             ]
 
-        origins = [anno["motion"]["current_origin"]]
+        origins = [anno["motion"]["origin"]]
         # Calculate the 2d origin (Only consider draw only one origin)
         origins_4d = [origin[:] + [1] for origin in origins]
         origin_2d = [camera_to_image(origin, is_real, intrinsic_matrix) for origin in origins_4d]
 
-        axises = [anno["motion"]["current_axis"]]
+        axises = [anno["motion"]["axis"]]
         new_point = list(np.array(origins[0]) + line_length * np.array(axises[0]))
         new_point = new_point[:] + [1]
         new_point = camera_to_image(new_point, is_real, intrinsic_matrix)
@@ -152,6 +153,9 @@ class MotionVisualizer(Visualizer):
         )
         circle_p = circle_p.transpose()
         circle_p_2d = np.asarray([camera_to_image(p, is_real, intrinsic_matrix) for p in circle_p])
+
+        # import pdb
+        # pdb.set_trace()
 
         self.draw_line(
             [origin_2d[0][0], new_point[0]],
@@ -234,7 +238,7 @@ class MotionVisualizer(Visualizer):
         # For translation joint, the motion origin is meaningless
         pred_type = prediction["mtype"]
         if pred_type == 1:
-            pred_origin = anno["motion"]["current_origin"]
+            pred_origin = anno["motion"]["origin"]
         else:
             pred_origin = prediction["morigin"]
 
@@ -248,11 +252,11 @@ class MotionVisualizer(Visualizer):
         pred_new_point = camera_to_image(pred_new_point, is_real, intrinsic_matrix)
 
         # Prepare the gt origin and gt axis
-        gt_origin = anno["motion"]["current_origin"]
+        gt_origin = anno["motion"]["origin"]
         gt_origin_4d = gt_origin + [1]
         gt_origin_2d = camera_to_image(gt_origin_4d, is_real, intrinsic_matrix)
         gt_axis = anno["motion"][
-            "current_axis"
+            "axis"
         ]  # gt_axis has been normalized in the annotation
         gt_new_point = list(np.array(gt_origin) + line_length * np.array(gt_axis))
         gt_new_point = gt_new_point + [1]
@@ -309,6 +313,7 @@ class MotionVisualizer(Visualizer):
         )
         gt_circle_p = gt_circle_p.transpose()
         gt_circle_p_2d = np.asarray([camera_to_image(p, is_real, intrinsic_matrix) for p in gt_circle_p])
+
         self.draw_line(
             [gt_origin_2d[0], gt_new_point[0]],
             [gt_origin_2d[1], gt_new_point[1]],
@@ -422,7 +427,7 @@ class MotionVisualizer(Visualizer):
         # Add the gt information
         match["gt"] = {}
         match["gt"]["partId"] = anno["motion"]["partId"]
-        match["gt"]["label"] = anno["motion"]["label"]
+        # match["gt"]["label"] = anno["motion"]["label"]
         match["gt"]["type"] = anno["motion"]["type"]
         match["gt"]["category_id"] = anno["category_id"]
         match["gt"]["origin"] = gt_origin

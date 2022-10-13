@@ -16,6 +16,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from numpy import dot
 from numpy.linalg import norm
+import pdb
 
 from motlib import (
     MotionTrainer,
@@ -218,8 +219,8 @@ if __name__ == "__main__":
     count = 0
     for d in dataset_dicts:
         if args.is_real:
-            # intrinsic_matrix = np.reshape(d["camera"]["intrinsic"]["matrix"], (3, 3), order='F')
-            intrinsic_matrix = np.array([[283.18526475694443, 0., 126.65098741319443], [0., 283.18526475694443, 128.45118272569442],[ 0., 0., 1.]]) 
+            intrinsic_matrix = np.reshape(d["camera"]["intrinsic"], (3, 3), order='F')
+            # intrinsic_matrix = np.array([[283.18526475694443, 0., 126.65098741319443], [0., 283.18526475694443, 128.45118272569442],[ 0., 0., 1.]]) 
             line_length = 0.2
         else:
             intrinsic_matrix = None
@@ -248,8 +249,10 @@ if __name__ == "__main__":
             gray = cv2.cvtColor(gray, cv2.COLOR_BGR2RGB)
             cv_in = gray.copy()
         else:
-            alpha = img[:, :, 3]
-            img[alpha != 255, :] = [255, 255, 255, 0]
+            # import pdb
+            # pdb.set_trace()
+            # alpha = img[:, :, 3]
+            # img[alpha != 255, :] = [255, 255, 255, 0]
             img = img[:, :, :3]
             cv_in = img.copy()
             cv_in = cv2.cvtColor(cv_in, cv2.COLOR_BGR2RGB)
@@ -332,9 +335,9 @@ if __name__ == "__main__":
                             dt_type[cat][it] = 1
                         ## Process the motion axis and motion origin
                         pred_origin = np.array(cat_pred[cat][it]["morigin"])
-                        gt_origin = np.array(gt_anno["motion"]["current_origin"])
+                        gt_origin = np.array(gt_anno["motion"]["origin"])
                         pred_axis = np.array(cat_pred[cat][it]["maxis"])
-                        gt_axis = np.array(gt_anno["motion"]["current_axis"])
+                        gt_axis = np.array(gt_anno["motion"]["axis"])
 
                         p = pred_origin - gt_origin
                         dt_origin[cat][it] = np.linalg.norm(
@@ -527,6 +530,7 @@ if __name__ == "__main__":
                 f'{(d["file_name"].split("/")[-1]).split(".")[0]}__{i}.png'
             )
             pred_gt_match[output_instance] = {}
+
             v = v.draw_pred_instance(pred[j], d, pred_gt_match[output_instance], is_real=args.is_real, intrinsic_matrix=intrinsic_matrix, line_length=line_length, no_mask=args.no_mask, diagonal_length=diagonal_length)
             if v:
                 pred_gt_match[output_instance]["map_detect"] = -1
@@ -548,6 +552,7 @@ if __name__ == "__main__":
                         cv_out = v.get_image()
                         cv_out = cv2.cvtColor(cv_out, cv2.COLOR_RGB2BGR)
                     cv2.imwrite(f"{cfg.OUTPUT_DIR}/{output_instance}", cv_out)
+                    # pdb.set_trace()
                 i = i + 1
             else:
                 pred_gt_match.pop(output_instance)

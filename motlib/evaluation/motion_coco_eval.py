@@ -445,9 +445,9 @@ class MotionCocoEval:
                     #     norm(gt_axis) * norm(pre_axis)
 
                     pred_origin = np.array(d["morigin"])
-                    gt_origin = np.array(gt[m]["motion"]["current_origin"])
+                    gt_origin = np.array(gt[m]["motion"]["origin"])
                     pred_axis = np.array(d["maxis"])
-                    gt_axis = np.array(gt[m]["motion"]["current_axis"])
+                    gt_axis = np.array(gt[m]["motion"]["axis"])
 
                     # Evaluation metric in the object coordinate for BMOC
                     if self.motionnet_type == "BMOC":

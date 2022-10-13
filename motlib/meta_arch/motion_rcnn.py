@@ -71,7 +71,7 @@ class MotionRCNN(GeneralizedRCNN):
 
         if "BMOC_V0" in self.motionnet_type:
             self.extrinsic_pred_layer = nn.Sequential(
-                nn.Linear(1024, 512),
+                nn.Linear(768, 512),
                 nn.ReLU(inplace=True),
                 nn.Linear(512, 128),
                 nn.ReLU(inplace=True),
